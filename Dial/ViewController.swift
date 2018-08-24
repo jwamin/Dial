@@ -71,13 +71,19 @@ class DialView:UIView{
         point.position = self.center
         self.layer.addSublayer(point)
         
-        
-        animationLine.frame = bounds
+        let newframe = CGRect(origin: bounds.origin, size: CGSize(width: 20, height:  bounds.height / 3 * 4))
+        animationLine.frame = newframe // bounds
+        animationLine.borderWidth = 1.0
+        animationLine.borderColor = UIColor.red.cgColor
+        animationLine.position = center
+        animationLine.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        print(center,animationLine.position)
         let path = UIBezierPath()
-        path.move(to: self.center)
-        path.addLine(to: CGPoint(x: center.x, y: 0))
+        path.move(to: animationLine.position)
+        path.addLine(to: CGPoint(x: center.x, y: -30))
+        animationLine.bounds = path.cgPath.boundingBox
+        animationLine.anchorPoint = CGPoint(x: 0.5, y: 1.0)
         
-
         //animationLine.actions = newActions;
         animationLine.path = path.cgPath
         animationLine.lineWidth = 2.0
@@ -99,7 +105,7 @@ class DialView:UIView{
         
         if(seconds != currentSecond){
             currentSecond = seconds
-            print("second updated",currentSecond)
+            //print("second updated",currentSecond)
             
             
         
