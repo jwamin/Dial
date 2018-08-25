@@ -16,6 +16,17 @@ class ViewController: UIViewController {
     let maxZoom:CGFloat = 2.0
     let minZoom:CGFloat = 0.6
     
+    var dialView:DialView!
+    
+    var didMove:Bool = false{
+        didSet{
+            if(didMove != oldValue){
+                showResetButton()
+            }
+        }
+    }
+    
+    
     private var cumulativeScale:CGFloat = 1.0
     
     let tempConstantForLayoutScaling:CGFloat = 700.0
@@ -25,7 +36,9 @@ class ViewController: UIViewController {
     }
     
     override func loadView() {
-        self.view = DialView(frame: UIScreen.main.bounds)
+        self.view = UIView()
+        dialView = DialView(frame: UIScreen.main.bounds);
+        self.view.addSubview(dialView)
     }
     
     override func viewDidLoad() {
@@ -44,6 +57,24 @@ class ViewController: UIViewController {
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(pan(gestureRecognizer:)))
         self.view.addGestureRecognizer(panGesture)
         
+        let resetButton = UIButton(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
+        resetButton.backgroundColor = UIColor.black
+        resetButton.translatesAutoresizingMaskIntoConstraints = false
+        resetButton.layer.masksToBounds = false
+        resetButton.clipsToBounds = true
+        resetButton.layer.cornerRadius = resetButton.frame.size.height / 2
+        resetButton.layer.borderColor = UIColor.white.cgColor
+        resetButton.layer.borderWidth = 2.0
+        resetButton.addTarget(self, action: #selector(resetView), for: .touchUpInside)
+        self.view.addSubview(resetButton)
+        
+        
+        NSLayoutConstraint(item: resetButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 80).isActive = true
+        NSLayoutConstraint(item: resetButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 80).isActive = true
+        NSLayoutConstraint(item: resetButton, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottomMargin, multiplier: 1.0, constant: -30).isActive = true
+        NSLayoutConstraint(item: resetButton, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .rightMargin, multiplier: 1.0, constant: -30).isActive = true
+        
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
 
@@ -52,6 +83,30 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    
+   @objc func resetView(){
+        if(didMove){
+            
+            UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 10, initialSpringVelocity: 20, options: [.beginFromCurrentState], animations: {
+               self.dialView.center = CGPoint(x: self.view.center.x,
+                                          y: self.view.center.y)
+                self.dialView.transform = .identity
+            }) { (complete) in
+                if(complete){
+                    print("complete")
+                    self.didMove = false
+                    self.cumulativeScale = 1.0
+                }
+            }
+            
+        }
+
+    }
+    
+    func showResetButton(){
+        print("showing reset button")
+    }
+    
     @objc func update(_ link:CADisplayLink){
         let currentDate = Date()
         let seconds = TimeInterval(Calendar.current.component(.second, from: currentDate))
@@ -61,7 +116,7 @@ class ViewController: UIViewController {
         let df = DateFormatter()
         df.dateFormat = "SSSS"
         let fs = seconds+Double("0."+df.string(from: currentDate))!
-        (view as! DialView).update(fs,seconds,minutes)
+        dialView.update(fs,seconds,minutes)
     }
 
     
@@ -81,8 +136,9 @@ class ViewController: UIViewController {
                 cumulativeScale *= gestureRecognizer.scale
                 
                 // Execute the transform
-                (view as! DialView).transform = (view as! DialView).transform.scaledBy(x: gestureRecognizer.scale,
+                dialView.transform = dialView.transform.scaledBy(x: gestureRecognizer.scale,
                                                                  y: gestureRecognizer.scale);
+                didMove = true
             } else {
                 print("something")
                 // If the cumulative scale has extended beyond the range, check
@@ -94,7 +150,7 @@ class ViewController: UIViewController {
                     print("will apply scale")
                     // If the user is trying to get back in-range, allow the transform
                     cumulativeScale *= gestureRecognizer.scale
-                    (view as! DialView).transform = (view as! DialView).transform.scaledBy(x: gestureRecognizer.scale,
+                    dialView.transform = dialView.transform.scaledBy(x: gestureRecognizer.scale,
                                                                      y: gestureRecognizer.scale);
                 } else {
                     print("out of range",nextScale,cumulativeScale,maxZoom,minZoom)
@@ -106,13 +162,13 @@ class ViewController: UIViewController {
     }
     
     @objc func pan(gestureRecognizer: UIPanGestureRecognizer) {
-         let animView = (view as! DialView)
+         let animView = dialView
         
         let translation = gestureRecognizer.translation(in: view)
         
-        (view as! DialView).center = CGPoint(x: (view as! DialView).center.x + translation.x,
-                                             y: (view as! DialView).center.y + translation.y)
-        
+        dialView.center = CGPoint(x: dialView.center.x + translation.x,
+                                             y: dialView.center.y + translation.y)
+        didMove = true
         gestureRecognizer.setTranslation(CGPoint(x: 0, y: 0), in: view)
         
     }
