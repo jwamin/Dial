@@ -23,7 +23,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.update()
         link = CADisplayLink(target: self, selector: #selector(update))
         link.preferredFramesPerSecond = 60
         link.add(to: RunLoop.current, forMode: .defaultRunLoopMode)
