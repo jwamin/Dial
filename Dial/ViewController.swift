@@ -9,6 +9,21 @@
 import UIKit
 import GLKit
 
+class ResetButton : UIButton{
+    
+    override var isHighlighted: Bool{
+        didSet{
+            if isHighlighted {
+                self.backgroundColor = UIColor.white
+            } else {
+                self.backgroundColor = UIColor.black
+            }
+        }
+    }
+
+}
+
+
 class ViewController: UIViewController {
 
     var link:CADisplayLink!
@@ -18,9 +33,12 @@ class ViewController: UIViewController {
     
     var dialView:DialView!
     
+    var resetButton:ResetButton!
+    var bottomConstraint:NSLayoutConstraint!
+    
     var didMove:Bool = false{
         didSet{
-            if(didMove != oldValue){
+            if(didMove != oldValue && didMove == true){
                 showResetButton()
             }
         }
@@ -57,24 +75,27 @@ class ViewController: UIViewController {
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(pan(gestureRecognizer:)))
         self.view.addGestureRecognizer(panGesture)
         
-        let resetButton = UIButton(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
-        resetButton.backgroundColor = UIColor.black
+        resetButton = ResetButton(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
         resetButton.translatesAutoresizingMaskIntoConstraints = false
         resetButton.layer.masksToBounds = false
         resetButton.clipsToBounds = true
         resetButton.layer.cornerRadius = resetButton.frame.size.height / 2
         resetButton.layer.borderColor = UIColor.white.cgColor
         resetButton.layer.borderWidth = 2.0
+        resetButton.isEnabled = false
         resetButton.addTarget(self, action: #selector(resetView), for: .touchUpInside)
         self.view.addSubview(resetButton)
         
-        
+        //Setup Constraints
         NSLayoutConstraint(item: resetButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 80).isActive = true
         NSLayoutConstraint(item: resetButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 80).isActive = true
-        NSLayoutConstraint(item: resetButton, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottomMargin, multiplier: 1.0, constant: -30).isActive = true
+        
+        bottomConstraint = NSLayoutConstraint(item: resetButton, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottomMargin, multiplier: 1.0, constant: 160)
+        bottomConstraint.isActive = true
+        
         NSLayoutConstraint(item: resetButton, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .rightMargin, multiplier: 1.0, constant: -30).isActive = true
         
-        
+
         // Do any additional setup after loading the view, typically from a nib.
     }
 
@@ -85,16 +106,23 @@ class ViewController: UIViewController {
 
     
    @objc func resetView(){
+    
         if(didMove){
-            
+            self.bottomConstraint.constant = 160
             UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 10, initialSpringVelocity: 20, options: [.beginFromCurrentState], animations: {
-               self.dialView.center = CGPoint(x: self.view.center.x,
+               
+                self.dialView.center = CGPoint(x: self.view.center.x,
                                           y: self.view.center.y)
+                
                 self.dialView.transform = .identity
+                
+                self.view.layoutIfNeeded()
+                
             }) { (complete) in
                 if(complete){
-                    print("complete")
+                    print("reset complete")
                     self.didMove = false
+                    self.resetButton.isEnabled = false
                     self.cumulativeScale = 1.0
                 }
             }
@@ -104,7 +132,21 @@ class ViewController: UIViewController {
     }
     
     func showResetButton(){
+        
         print("showing reset button")
+         self.bottomConstraint.constant = -30
+        UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 10, initialSpringVelocity: 20, options: [.beginFromCurrentState], animations: {
+           
+            self.view.layoutIfNeeded()
+        }) { (complete) in
+            if(complete){
+                print("complete")
+                self.resetButton.isEnabled = true
+            }
+        }
+        
+        
+        
     }
     
     @objc func update(_ link:CADisplayLink){

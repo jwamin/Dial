@@ -23,6 +23,7 @@
 		3D99A73721260CE900420AF6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3D99A73A21260CE900420AF6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3D99A73C21260CE900420AF6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5797E19B2131C24100171784 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		57FA978C2130C740002EEB43 /* DialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -40,6 +41,7 @@
 		3D99A72421260CE700420AF6 = {
 			isa = PBXGroup;
 			children = (
+				5797E19B2131C24100171784 /* README.md */,
 				3D99A72F21260CE700420AF6 /* Dial */,
 				3D99A72E21260CE700420AF6 /* Products */,
 			);
