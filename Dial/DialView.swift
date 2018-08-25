@@ -82,7 +82,30 @@ class DialView:UIView{
         //update variables only when the values explicitly change
         if(minutes != self.minutes){
             self.minutes = minutes
-            remainingMinutes = 60 - Int(minutes)
+            remainingMinutes = 60 - Int(minutes) - 1 //offset
+            
+//            let animation = CABasicAnimation(keyPath: "transform")
+//            animation.fromValue = CATransform3DIdentity
+            
+//            let heightScale = (concentrics.bounds.size.height - 30) / concentrics.bounds.size.height
+//            let widthScale = (concentrics.bounds.size.width - 30) / concentrics.bounds.size.width
+//            print(heightScale,widthScale)
+//            animation.toValue = CATransform3DMakeScale(widthScale, heightScale, 1.0)
+//            animation.beginTime = 0.0
+//            animation.duration = 1.0
+//            animation.fillMode = kCAFillModeForwards
+//
+//            CATransaction.begin()
+//            CATransaction.setDisableActions(true)
+//            concentrics.add(animation, forKey: nil)
+//            CATransaction.setCompletionBlock {
+//                self.concentrics.transform = CATransform3DIdentity
+//                self.drawConcentrics()
+//            }
+//            CATransaction.commit()
+            
+            
+            //do this on callback
             drawConcentrics()
         }
         
@@ -121,12 +144,24 @@ class DialView:UIView{
     func drawConcentrics(){
         
        let path = CGMutablePath()
-        
+        concentrics.opacity = 0.0
         for remainingMinute in 0...remainingMinutes{
             let radius = CGFloat(remainingMinute * 10 + 20)
             let circlePath = UIBezierPath(arcCenter: self.center, radius: radius, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
             path.addPath(circlePath.cgPath)
         }
+        
+        let pathAnimation = CABasicAnimation(keyPath: "strokeStart")
+        pathAnimation.beginTime = 0.0
+        pathAnimation.fromValue = 1.0
+        pathAnimation.toValue = 0.0
+        pathAnimation.duration = 2.0
+        pathAnimation.fillMode = kCAFillModeForwards
+        
+        CATransaction.begin()
+        concentrics.opacity = 1.0
+        concentrics.add(pathAnimation, forKey: nil)
+        CATransaction.commit()
         
          concentrics.path = path
         concentrics.bounds = path.boundingBox
