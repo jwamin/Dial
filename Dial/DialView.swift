@@ -18,6 +18,7 @@ class DialView:UIView{
     private var arcAngle:CGFloat = 0.0
     
     let animationLine = CAShapeLayer()
+    let concentrics = CAShapeLayer()
     
     override init(frame: CGRect) {
         
@@ -57,6 +58,11 @@ class DialView:UIView{
         animationLine.strokeColor = UIColor.white.cgColor
         self.layer.addSublayer(animationLine)
         
+       concentrics.fillColor = UIColor.clear.cgColor
+        concentrics.strokeColor = UIColor.white.cgColor
+        concentrics.lineWidth = 1.0
+        self.layer.addSublayer(concentrics)
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -77,7 +83,7 @@ class DialView:UIView{
         if(minutes != self.minutes){
             self.minutes = minutes
             remainingMinutes = 60 - Int(minutes)
-            print(remainingMinutes)
+            drawConcentrics()
         }
         
         if(seconds != currentSecond){
@@ -112,6 +118,21 @@ class DialView:UIView{
         
     }
     
+    func drawConcentrics(){
+        
+       let path = CGMutablePath()
+        
+        for remainingMinute in 0...remainingMinutes{
+            let radius = CGFloat(remainingMinute * 10 + 20)
+            let circlePath = UIBezierPath(arcCenter: self.center, radius: radius, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+            path.addPath(circlePath.cgPath)
+        }
+        
+         concentrics.path = path
+        concentrics.bounds = path.boundingBox
+        concentrics.position = self.center
+    }
+    
     override func draw(_ rect: CGRect) {
         
         //get context
@@ -130,13 +151,7 @@ class DialView:UIView{
         context?.setFillColor(UIColor.clear.cgColor)
         circlePath.stroke()
         
-        //create concentric circlepaths for remaining minutes
-        //pretty unnecessarily intensive...
-        for remainingMinute in 0...remainingMinutes{
-            let radius = CGFloat(remainingMinute * 10 + 20)
-            let circlePath = UIBezierPath(arcCenter: self.center, radius: radius, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
-            circlePath.stroke()
-        }
+
         
     }
     
