@@ -10,6 +10,8 @@ import UIKit
 import GLKit
 
 class ResetButton : UIButton{
+
+    
     
     override var isHighlighted: Bool{
         didSet{
@@ -76,6 +78,7 @@ class ViewController: UIViewController {
         self.view.addGestureRecognizer(panGesture)
         
         resetButton = ResetButton(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
+        resetButton.backgroundColor = UIColor.black
         resetButton.translatesAutoresizingMaskIntoConstraints = false
         resetButton.layer.masksToBounds = false
         resetButton.clipsToBounds = true
@@ -86,7 +89,7 @@ class ViewController: UIViewController {
         resetButton.addTarget(self, action: #selector(resetView), for: .touchUpInside)
         self.view.addSubview(resetButton)
         
-        //Setup Constraints
+        //Setup Constraints for reset button
         NSLayoutConstraint(item: resetButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 80).isActive = true
         NSLayoutConstraint(item: resetButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 80).isActive = true
         
